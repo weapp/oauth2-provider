@@ -2,8 +2,19 @@ module Songkick
   module OAuth2
     module Model
 
-      class Authorization < ActiveRecord::Base
-        self.table_name = :oauth2_authorizations
+      Authorization = Class.new(ActiveRecord::Base) unless Object.const_defined?("MongoMapper")
+
+      class Authorization
+        if Object.const_defined?("MongoMapper")
+          include MongoMapper::Document
+          key :scope                , String
+          key :code                 , String
+          key :access_token_hash    , String
+          key :refresh_token_hash   , String
+          key :expires_at           , Time
+        else
+          self.table_name = :oauth2_authorizations
+        end
 
         belongs_to :oauth2_resource_owner, :polymorphic => true
         alias :owner  :oauth2_resource_owner
@@ -53,11 +64,13 @@ module Songkick
             raise ArgumentError, "The argument should be a #{Client}, instead it was a #{client.class}"
           end
 
-          instance = owner.oauth2_authorization_for(client) ||
-                     new do |authorization|
-                       authorization.owner  = owner
-                       authorization.client = client
-                     end
+          instance = owner.oauth2_authorization_for(client)
+
+          unless instance
+            instance = new
+            instance.owner = owner
+            instance.client = client
+          end
 
           case attributes[:response_type]
             when CODE

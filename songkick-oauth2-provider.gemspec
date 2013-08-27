@@ -12,7 +12,9 @@ spec = Gem::Specification.new do |s|
   s.files             = %w[History.txt README.rdoc] + Dir.glob('{example,lib,spec}/**/*.{css,erb,rb,rdoc,ru}')
   s.require_paths     = ['lib']
 
-  s.add_dependency 'activerecord'
+  s.add_dependency 'mongo' if ENV['DB'] == 'mongo'
+  s.add_dependency 'mongo_mapper' if ENV['DB'] == 'mongo'
+  s.add_dependency 'activerecord' unless ENV['DB'] == 'mongo'
   s.add_dependency 'bcrypt-ruby'
   s.add_dependency 'json'
   s.add_dependency 'rack'

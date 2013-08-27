@@ -2,8 +2,21 @@ module Songkick
   module OAuth2
     module Model
 
-      class Client < ActiveRecord::Base
-        self.table_name = :oauth2_clients
+      Client = Class.new(ActiveRecord::Base) unless Object.const_defined?("MongoMapper")
+
+      class Client
+        if Object.const_defined?("MongoMapper")
+          include MongoMapper::Document
+          key :client_id,                 Integer
+          key :oauth2_client_owner_type,  String
+          key :oauth2_client_owner_id,    Integer
+          key :name,                      String
+          key :client_id,                 String
+          key :client_secret_hash,        String
+          key :redirect_uri,              String
+        else
+          self.table_name = :oauth2_clients
+        end
 
         belongs_to :oauth2_client_owner, :polymorphic => true
         alias :owner  :oauth2_client_owner
