@@ -7,9 +7,6 @@ module Songkick
       class Client
         if Object.const_defined?("MongoMapper")
           include MongoMapper::Document
-          key :client_id,                 Integer
-          key :oauth2_client_owner_type,  String
-          key :oauth2_client_owner_id,    Integer
           key :name,                      String
           key :client_id,                 String
           key :client_secret_hash,        String
